@@ -4,10 +4,9 @@ import torch
 from torch import nn
 from torch.utils.data import Dataset
 
-from transformers import (
-    BertTokenizerFast, BertModel, PreTrainedTokenizerBase)
+from transformers import BertTokenizerFast, BertModel, PreTrainedTokenizerBase
 
-PRE_TRAINED_REF = 'neuralmind/bert-base-portuguese-cased'
+PRE_TRAINED_REF = 'neuralmind/bert-large-portuguese-cased'
 DEFAULT_DROPOUT = 0.1
 DEFAULT_MAX_LEN = 256
 

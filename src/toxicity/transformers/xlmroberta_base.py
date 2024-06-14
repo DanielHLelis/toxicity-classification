@@ -4,21 +4,20 @@ import torch
 from torch import nn
 from torch.utils.data import Dataset
 
-from transformers import (
-    BertTokenizerFast, BertModel, PreTrainedTokenizerBase)
+from transformers import XLMRobertaTokenizerFast, XLMRobertaModel, PreTrainedTokenizerBase
 
-PRE_TRAINED_REF = 'neuralmind/bert-base-portuguese-cased'
+PRE_TRAINED_REF = 'FacebookAI/xlm-roberta-base'
 DEFAULT_DROPOUT = 0.1
 DEFAULT_MAX_LEN = 256
 
 
-def bert_tokenizer(ref: str = PRE_TRAINED_REF, truncation: bool = True, do_lower_case: bool = True,
+def xlm_roberta_tokenizer(ref: str = PRE_TRAINED_REF, truncation: bool = True, do_lower_case: bool = True,
                    **kwargs) -> PreTrainedTokenizerBase:
-    return BertTokenizerFast.from_pretrained(ref, truncation=truncation, do_lower_case=do_lower_case,
+    return XLMRobertaTokenizerFast.from_pretrained(ref, truncation=truncation, do_lower_case=do_lower_case,
                                              **kwargs)
 
 
-class BertDataset(Dataset):
+class XLMRobertaDataset(Dataset):
     tokenizer: PreTrainedTokenizerBase
     data: pl.DataFrame
     text: pl.Series
@@ -64,11 +63,11 @@ class BertDataset(Dataset):
         }
 
 
-class BertModule(nn.Module):
+class XLMRobertaModule(nn.Module):
     def __init__(self, feature_count: int, dropout: float = DEFAULT_DROPOUT, hidden_size: int = 768,
                  ref: str = PRE_TRAINED_REF):
-        super(BertModule, self).__init__()
-        self.bert = BertModel.from_pretrained(ref)
+        super(XLMRobertaModule, self).__init__()
+        self.xlm_roberta = XLMRobertaModule.from_pretrained(ref)
 
         # Fully connected layer to transform the model features
         self.pre_classifier = torch.nn.Linear(hidden_size, hidden_size, dtype=torch.float32)
@@ -83,7 +82,7 @@ class BertModule(nn.Module):
         nn.init.xavier_normal_(self.classifier.weight)
 
     def forward(self, input_ids, attention_mask):
-        output = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        output = self.xlm_roberta(input_ids=input_ids, attention_mask=attention_mask)
         hidden_state = output[0]
         pooler = hidden_state[:, 0]
         pooler = self.pre_classifier(pooler)
@@ -93,7 +92,7 @@ class BertModule(nn.Module):
         return logits
 
 
-class BertDatasetBF16(Dataset):
+class XLMRobertaDatasetBF16(Dataset):
     tokenizer: PreTrainedTokenizerBase
     data: pl.DataFrame
     text: pl.Series
@@ -139,11 +138,11 @@ class BertDatasetBF16(Dataset):
         }
 
 
-class BertModuleBF16(nn.Module):
+class XLMRobertaModuleBF16(nn.Module):
     def __init__(self, feature_count: int, dropout: float = DEFAULT_DROPOUT, hidden_size: int = 768,
                  ref: str = PRE_TRAINED_REF):
-        super(BertModuleBF16, self).__init__()
-        self.bert = BertModel.from_pretrained(ref).bfloat16()
+        super(XLMRobertaModuleBF16, self).__init__()
+        self.xlm_roberta = XLMRobertaModel.from_pretrained(ref).bfloat16()
 
         # Fully connected layer to transform the model features
         self.pre_classifier = torch.nn.Linear(hidden_size, hidden_size, 
@@ -160,7 +159,7 @@ class BertModuleBF16(nn.Module):
         nn.init.xavier_normal_(self.classifier.weight)
 
     def forward(self, input_ids, attention_mask):
-        output = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        output = self.xlm_roberta(input_ids=input_ids, attention_mask=attention_mask)
         hidden_state = output[0]
         pooler = hidden_state[:, 0]
         pooler = self.pre_classifier(pooler)
