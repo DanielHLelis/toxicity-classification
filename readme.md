@@ -31,36 +31,38 @@ found some open datasets appropriate for usage:
 
 ### Conda or Mamba
 
-When using `conda`, `mamba` and its derivatives, you can create a new
+When using `conda`, `micromamba` and its derivatives, you can create a new
 environment, activate it, and add the dependencies with the following commands:
 
 ```bash
-# Swap micromamba for conda if you are using it
-
 # Create the environment
-micromamba create -n toxicity-classification python=3.12 -c conda-forge
+conda create -n toxicity-classification python=3.12 -c conda-forge
 
 # Activate the environment
-micromamba activate toxicity-classification
+conda activate toxicity-classification
 
 # Install dependencies for visualization
-micromamba install jupyter polars numpy pandas pyarrow plotly matplotlib seaborn scipy -c conda-forge
+conda install jupyter polars numpy pandas pyarrow plotly matplotlib seaborn scipy -c conda-forge
 
 # Install dependencies for text processing (stanza and nltk)
-micromamba install stanza nltk -c conda-forge
+conda install stanza nltk -c conda-forge
 
 # Install dependencies for machine learning (scikit-learn and pytorch)
-micromamba install scikit-learn -c conda-forge
+conda install scikit-learn -c conda-forge
 
 # For PyTorch, recommend checking for your specific setup at: https://pytorch.org
-micromamba install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+conda install pytorch torchvision torchaudio pytorch-cuda=12.4 -c pytorch-nightly -c nvidia
 
 # For transformers, we use some pre-trained models from Hugging Face, so we need to install it
-micromamba install transformers -c conda-forge
+conda install transformers -c conda-forge
 ```
 
 For installing everything at once, you can use the `environment.yml` file:
 
 ```bash
+# For Conda
+conda env create -n toxicity-classification -f environment.yml
+
+# For Micromamba
 micromamba create -n toxicity-classification -f environment.yml
 ```
