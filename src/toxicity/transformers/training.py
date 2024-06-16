@@ -6,6 +6,9 @@ from torch import nn
 from torch import optim
 from torch.utils.data import DataLoader
 
+from sklearn.metrics import (
+    f1_score, fbeta_score, accuracy_score, recall_score, precision_score)
+
 from ..utils.tqdm import tqdm
 
 def load_checkpoint(
@@ -116,6 +119,7 @@ def train_epochs(
     checkpoint_path: Optional[str] = None,
     autocast: bool = False,
     autocast_dtype: Optional[torch.dtype] = torch.float16,
+    epoch_callback: Optional[Callable[[int, float], None]] = None,
 ):
     for epoch in range(start_epoch, epoch_count):
         if log_progress:
@@ -126,6 +130,8 @@ def train_epochs(
         )
         if checkpoint_path:
             checkpoint_handler(epoch, avg_loss, checkpoint_path, model, optimizer)
+        if epoch_callback:
+            epoch_callback(epoch, avg_loss)
         if log_progress:
             print(
                 f"Finished training epoch {epoch + 1}/{epoch_count}; Average Loss: {avg_loss:.4f}"
@@ -177,3 +183,34 @@ def validate(
 
     # Return the evaluated data
     return actual_outputs, target_outputs
+
+
+def model_metrics(targets, results, print_metrics: bool = False):
+    fixed_weighted_f1 = f1_score(targets, results, average='weighted')
+    fixed_macro_f1 = f1_score(targets, results, average='macro')
+    fixed_weighted_f2 = fbeta_score(targets, results, beta=2, average='weighted')
+    fixed_macro_f2 = fbeta_score(targets, results, beta=2, average='macro')
+    fixed_accuracy = accuracy_score(targets, results)
+    fixed_recall = recall_score(targets, results, average='weighted')
+    fixed_precision = precision_score(targets, results, average='weighted')
+
+    metrics = {
+        "weighted_f1": fixed_weighted_f1,
+        "macro_f1": fixed_macro_f1,
+        "weighted_f2": fixed_weighted_f2,
+        "macro_f2": fixed_macro_f2,
+        "accuracy": fixed_accuracy,
+        "recall": fixed_recall,
+        "precision": fixed_precision,
+    }
+
+    if print_metrics:
+        print(f"Weighted F1: {fixed_weighted_f1}")
+        print(f"Macro F1: {fixed_macro_f1}")
+        print(f"Weighted F2: {fixed_weighted_f2}")
+        print(f"Macro F2: {fixed_macro_f2}")
+        print(f"Accuracy: {fixed_accuracy}")
+        print(f"Recall: {fixed_recall}")
+        print(f"Precision: {fixed_precision}")
+
+    return metrics
