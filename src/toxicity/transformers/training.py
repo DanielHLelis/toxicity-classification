@@ -168,7 +168,7 @@ def validate(
             processed_targets = batch_data["targets"].tolist()
             # Compute the actual results through a sigmoid (values will range from 0 to 1)
             processed_outputs = (
-                torch.sigmoid(cur_outputs).cpu().detach().numpy().tolist()
+                torch.sigmoid(cur_outputs).to(torch.float32).cpu().detach().numpy().tolist()
             )
 
             # Update the result arrays
