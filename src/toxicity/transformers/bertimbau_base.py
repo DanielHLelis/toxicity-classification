@@ -12,7 +12,7 @@ from transformers import (
 )
 
 PRE_TRAINED_REF = "neuralmind/bert-base-portuguese-cased"
-DEFAULT_DROPOUT = 0.1
+DEFAULT_DROPOUT = 0.2
 DEFAULT_MAX_LEN = 256
 
 

@@ -1,6 +1,3 @@
-model/
-models/
-checkpoint/
 checkpoints/
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,vim,visualstudiocode,pycharm+all,latex
